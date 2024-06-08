@@ -1,0 +1,46 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def calculate_ppv_sedimentary(w, d):
+    return 969 * w**0.6 * d**-1.5
+
+def calculate_ppv_igneous(w, d):
+    return 206 * w**0.8 * d**-1.3
+
+# Ζήτηση ποσότητας εκρηκτικών από τον χρήστη
+w = float(input("Εισάγετε την ποσότητα των εκρηκτικών (kg): "))
+
+# Ορισμός αποστάσεων
+distances = np.arange(50, 2001, 75)
+
+# Υπολογισμός ppv για Βωξίτη και Γρανίτη
+ppv_sedimentary = [calculate_ppv_sedimentary(w, d) for d in distances]
+ppv_igneous = [calculate_ppv_igneous(w, d) for d in distances]
+
+# Δημιουργία πίνακα δεδομένων
+data = {
+    'Απόσταση (m)': distances,
+    'PPV Βωξίτη (mm/s)': ppv_sedimentary,
+    'PPV Γρανίτη (mm/s)': ppv_igneous
+}
+
+df = pd.DataFrame(data)
+
+# Εμφάνιση του πίνακα
+print(df.to_string(index=False, float_format="{:.2f}".format))
+
+# Αποθήκευση του πίνακα σε αρχείο .txt
+df.to_csv('ppv_results.txt', sep='\t', index=False, float_format='%.2f')
+
+# Δημιουργία γραφήματος
+plt.figure(figsize=(10, 6))
+plt.plot(distances, ppv_sedimentary, label='Βωξίτης (Ιζηματογενές)', linestyle='-', marker='o')
+plt.plot(distances, ppv_igneous, label='Γρανίτης (Ηφαιστειογενές)', linestyle='-', marker='s')
+plt.xlabel('Απόσταση (m)')
+plt.ylabel('PPV (mm/s)')
+plt.title('Ταχύτητα Εδαφικής Δόνησης (PPV) σε σχέση με την Απόσταση')
+plt.legend()
+plt.grid(True)
+plt.savefig('ppv_plot.png')
+plt.show()
